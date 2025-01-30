@@ -1,46 +1,36 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Sample Deployment</title>
-  <style>
-    body {
-      color: #ffffff;
-      background-color: #6a5acd;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      text-align: center;
-    }
-    
-    h1 {
-      font-size: 500%;
-      font-weight: normal;
-      margin-bottom: 0;
-    }
-    
-    h2 {
-      font-size: 200%;
-      font-weight: normal;
-      margin-bottom: 0;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-      margin: 20px 0;
-    }
-  </style>
+<html lang="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div>
-    <h1>Congratulations!</h1>
-    <a href="https://medium.com/@amolbansal1234/what-is-devops-and-its-benefits-db56f1949234" target="_blank">
-      <img src="https://miro.medium.com/v2/resize:fit:720/format:webp/0*fyARHZAlO3hY5u85.png" alt="DevOps Lifecycle">
-    </a>
-    <h2>Hi, This is M019142- Satishwaran M, and I have successfully created a pipeline that retrieved this source application from an Amazon S3 bucket and deployed it 
-      to three Amazon EC2 instances using AWS CodeDeploy.</h2>
-    <p>For next steps, read the <a href="https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html" target="_blank">AWS CodePipeline Documentation</a>.</p>
-  </div>
+    <h1>Tic Tac Toe</h1>
+
+   <div class="wrapper">
+       <div class="container">
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+           <button class="button-option"></button>
+       </div>
+       <button id="restart">Restart</button>
+   </div>
+
+   <div class="popup hide">
+       <p id="message">Sample Message</p>
+       <button id="new-game">New Game</button>
+   </div>
+   
+    <!-- Script -->
+    <script src="script.js"></script>
 </body>
 </html>
-
