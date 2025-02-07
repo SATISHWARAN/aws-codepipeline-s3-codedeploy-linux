@@ -1,36 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap" rel="stylesheet">
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCQ Test</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Tic Tac Toe</h1>
-
-   <div class="wrapper">
-       <div class="container">
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-           <button class="button-option"></button>
-       </div>
-       <button id="restart">Restart</button>
-   </div>
-
-   <div class="popup hide">
-       <p id="message">Sample Message</p>
-       <button id="new-game">New Game</button>
-   </div>
-   
-    <!-- Script -->
-    <script src="script.js"></script>
+  <div class="container">
+    <h1>MCQ Test</h1>
+    <div id="timer">Time Left: <span id="time">10:00</span></div>
+    <div id="quiz-container">
+      <p id="question-counter"></p>
+      <p id="question"></p>
+      <div id="options"></div>
+      <button onclick="nextQuestion()">Next</button>
+    </div>
+    <div id="result" style="display: none;">
+      <h2>Your Score: <span id="score"></span></h2>
+      <div id="review"></div>
+      <button onclick="restartQuiz()">Restart Quiz</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
