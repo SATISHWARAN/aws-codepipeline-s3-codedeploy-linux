@@ -1,105 +1,108 @@
-const questions = [
-  { question: "What is the capital of France?", options: ["Paris", "London", "Berlin", "Rome"], answer: "Paris" },
-  { question: "Which programming language is used for web development?", options: ["Python", "JavaScript", "Java", "C++"], answer: "JavaScript" },
-  { question: "Which cloud service is owned by Amazon?", options: ["Azure", "AWS", "Google Cloud", "IBM Cloud"], answer: "AWS" },
-  { question: "What does 'IaaS' stand for?", options: ["Infrastructure as a Service", "Internet as a Service", "Integration as a Service", "Intelligence as a Service"], answer: "Infrastructure as a Service" },
-  { question: "Which of these is not a top cloud provider?", options: ["AWS", "Google Cloud", "IBM", "Microsoft Azure"], answer: "IBM" },
-  { question: "Which cloud computing model provides virtualized resources?", options: ["IaaS", "PaaS", "SaaS", "DaaS"], answer: "IaaS" },
-  { question: "Which cloud provider is known for Azure?", options: ["Amazon", "Google", "Microsoft", "IBM"], answer: "Microsoft" },
-  { question: "What is the main benefit of DevOps?", options: ["Faster development cycles", "Lower software costs", "More robust software", "All of the above"], answer: "All of the above" },
-  { question: "What is AWS CodePipeline used for?", options: ["Infrastructure as Code", "CI/CD", "Cloud Storage", "Database Management"], answer: "CI/CD" },
-  { question: "What does 'ls' do in Linux?", options: ["List files", "Change directory", "Remove files", "Execute program"], answer: "List files" }
+let btnRef = document.querySelectorAll(".button-option");
+let popupRef = document.querySelector(".popup");
+let newgameBtn = document.getElementById("new-game");
+let restartBtn = document.getElementById("restart");
+let msgRef = document.getElementById("message");
+//Winning Pattern Array
+let winningPattern = [
+  [0, 1, 2],
+  [0, 3, 6],
+  [2, 5, 8],
+  [6, 7, 8],
+  [3, 4, 5],
+  [1, 4, 7],
+  [0, 4, 8],
+  [2, 4, 6],
 ];
+//Player 'X' plays first
+let xTurn = true;
+let count = 0;
 
-let currentQuestionIndex = 0;
-let score = 0;
-let userAnswers = [];
-let timeLeft = 600; // 10 minutes in seconds
-let timer;
+//Disable All Buttons
+const disableButtons = () => {
+  btnRef.forEach((element) => (element.disabled = true));
+  //enable popup
+  popupRef.classList.remove("hide");
+};
 
-// Start the timer when the page loads
-function startTimer() {
-  timer = setInterval(() => {
-    timeLeft--;
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    document.getElementById("time").textContent = `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
-    
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      showResult();
-    }
-  }, 1000);
-}
-
-function displayQuestion() {
-  const question = questions[currentQuestionIndex];
-  document.getElementById("question-counter").textContent = `Question ${currentQuestionIndex + 1} / ${questions.length}`;
-  document.getElementById("question").textContent = question.question;
-  
-  const options = document.getElementById("options");
-  options.innerHTML = "";
-  question.options.forEach(option => {
-    const div = document.createElement("div");
-    div.textContent = option;
-    div.onclick = () => selectAnswer(option);
-    options.appendChild(div);
+//Enable all buttons (For New Game and Restart)
+const enableButtons = () => {
+  btnRef.forEach((element) => {
+    element.innerText = "";
+    element.disabled = false;
   });
-}
+  //disable popup
+  popupRef.classList.add("hide");
+};
 
-function selectAnswer(selectedOption) {
-  const question = questions[currentQuestionIndex];
-  userAnswers[currentQuestionIndex] = selectedOption;
-  
-  if (selectedOption === question.answer) {
-    score++;
-  }
-  
-  document.querySelectorAll("#options div").forEach(option => option.style.pointerEvents = "none");
-  setTimeout(nextQuestion, 500);
-}
-
-function nextQuestion() {
-  if (currentQuestionIndex < questions.length - 1) {
-    currentQuestionIndex++;
-    displayQuestion();
+//This function is executed when a player wins
+const winFunction = (letter) => {
+  disableButtons();
+  if (letter == "X") {
+    msgRef.innerHTML = "&#x1F389; <br> 'X' Wins";
   } else {
-    clearInterval(timer);
-    showResult();
+    msgRef.innerHTML = "&#x1F389; <br> 'O' Wins";
   }
-}
+};
 
-function showResult() {
-  document.getElementById("quiz-container").style.display = "none";
-  document.getElementById("result").style.display = "block";
-  document.getElementById("score").textContent = `${score} / ${questions.length}`;
-  
-  const review = document.getElementById("review");
-  review.innerHTML = "";
+//Function for draw
+const drawFunction = () => {
+  disableButtons();
+  msgRef.innerHTML = "&#x1F60E; <br> It's a Draw";
+};
 
-  questions.forEach((question, index) => {
-    const resultDiv = document.createElement("div");
-    if (userAnswers[index] === question.answer) {
-      resultDiv.classList.add("correct");
-      resultDiv.textContent = `Q${index + 1}: ${question.question} - ✅ ${userAnswers[index]}`;
-    } else {
-      resultDiv.classList.add("incorrect");
-      resultDiv.textContent = `Q${index + 1}: ${question.question} - ❌ ${userAnswers[index]} (Correct: ${question.answer})`;
+//New Game
+newgameBtn.addEventListener("click", () => {
+  count = 0;
+  enableButtons();
+});
+restartBtn.addEventListener("click", () => {
+  count = 0;
+  enableButtons();
+});
+
+//Win Logic
+const winChecker = () => {
+  //Loop through all win patterns
+  for (let i of winningPattern) {
+    let [element1, element2, element3] = [
+      btnRef[i[0]].innerText,
+      btnRef[i[1]].innerText,
+      btnRef[i[2]].innerText,
+    ];
+    //Check if elements are filled
+    //If 3 empty elements are same and would give win as would
+    if (element1 != "" && (element2 != "") & (element3 != "")) {
+      if (element1 == element2 && element2 == element3) {
+        //If all 3 buttons have same values then pass the value to winFunction
+        winFunction(element1);
+      }
     }
-    review.appendChild(resultDiv);
+  }
+};
+
+//Display X/O on click
+btnRef.forEach((element) => {
+  element.addEventListener("click", () => {
+    if (xTurn) {
+      xTurn = false;
+      //Display X
+      element.innerText = "X";
+      element.disabled = true;
+    } else {
+      xTurn = true;
+      //Display Y
+      element.innerText = "O";
+      element.disabled = true;
+    }
+    //Increment count on each click
+    count += 1;
+    if (count == 9) {
+      drawFunction();
+    }
+    //Check for win on every click
+    winChecker();
   });
-}
-
-function restartQuiz() {
-  currentQuestionIndex = 0;
-  score = 0;
-  userAnswers = [];
-  timeLeft = 600;
-  document.getElementById("result").style.display = "none";
-  document.getElementById("quiz-container").style.display = "block";
-  displayQuestion();
-  startTimer();
-}
-
-startTimer();
-displayQuestion();
+});
+//Enable Buttons and disable popup on page load
+window.onload = enableButtons;
