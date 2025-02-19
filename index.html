@@ -1,27 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCQ Test</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px gray;
+        }
+        #timer {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>MCQ Test</h1>
-    <div id="timer">Time Left: <span id="time">10:00</span></div>
-    <div id="quiz-container">
-      <p id="question-counter"></p>
-      <p id="question"></p>
-      <div id="options"></div>
-      <button onclick="nextQuestion()">Next</button>
+    <div class="container">
+        <h1>MCQ Test</h1>
+        <div id="timer">Time Left: 10:00</div>
+        <form id="quiz-form">
+            <div id="questions"></div>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="result"></div>
     </div>
-    <div id="result" style="display: none;">
-      <h2>Your Score: <span id="score"></span></h2>
-      <div id="review"></div>
-      <button onclick="restartQuiz()">Restart Quiz</button>
-    </div>
-  </div>
-  <script src="script.js"></script>
+    <script>
+        const questions = [
+            { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: "4" },
+            { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Lisbon"], answer: "Paris" },
+            // Add 8 more questions
+        ];
+
+        let timeLeft = 600;
+        const timerElement = document.getElementById("timer");
+
+        function startTimer() {
+            const timer = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitQuiz();
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        function loadQuestions() {
+            const quizContainer = document.getElementById("questions");
+            questions.forEach((q, index) => {
+                const div = document.createElement("div");
+                div.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => 
+                    `<label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`).join("");
+                quizContainer.appendChild(div);
+            });
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (selected && selected.value === q.answer) {
+                    score++;
+                }
+            });
+            document.getElementById("result").textContent = `Your score: ${score}/10`;
+        }
+
+        document.getElementById("quiz-form").addEventListener("submit", (e) => {
+            e.preventDefault();
+            submitQuiz();
+        });
+
+        loadQuestions();
+        startTimer();
+    </script>
 </body>
 </html>
+
