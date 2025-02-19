@@ -41,21 +41,31 @@
     <div class="container">
         <h1>MCQ Test</h1>
         <div id="timer">Time Left: 10:00</div>
-        <form id="quiz-form">
-            <div id="questions"></div>
-            <button type="submit">Submit</button>
-        </form>
+        <div id="question-container"></div>
+        <button id="next-button">Next</button>
         <div id="result"></div>
     </div>
     <script>
         const questions = [
             { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: "4" },
             { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Lisbon"], answer: "Paris" },
-            // Add 8 more questions
+            { question: "What is 5 x 3?", options: ["15", "10", "20", "25"], answer: "15" },
+            { question: "What is the square root of 16?", options: ["2", "4", "6", "8"], answer: "4" },
+            { question: "Which planet is known as the Red Planet?", options: ["Earth", "Mars", "Jupiter", "Venus"], answer: "Mars" },
+            { question: "Who wrote 'Hamlet'?", options: ["Shakespeare", "Dickens", "Austen", "Hemingway"], answer: "Shakespeare" },
+            { question: "What is H2O?", options: ["Oxygen", "Hydrogen", "Water", "Helium"], answer: "Water" },
+            { question: "Which gas do plants use for photosynthesis?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: "Carbon Dioxide" },
+            { question: "How many continents are there on Earth?", options: ["5", "6", "7", "8"], answer: "7" },
+            { question: "What is the largest mammal?", options: ["Elephant", "Blue Whale", "Giraffe", "Shark"], answer: "Blue Whale" }
         ];
 
+        let currentQuestionIndex = 0;
+        let score = 0;
         let timeLeft = 600;
         const timerElement = document.getElementById("timer");
+        const questionContainer = document.getElementById("question-container");
+        const nextButton = document.getElementById("next-button");
+        const resultContainer = document.getElementById("result");
 
         function startTimer() {
             const timer = setInterval(() => {
@@ -64,41 +74,40 @@
                 timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                 if (timeLeft <= 0) {
                     clearInterval(timer);
-                    submitQuiz();
+                    showResult();
                 }
                 timeLeft--;
             }, 1000);
         }
 
-        function loadQuestions() {
-            const quizContainer = document.getElementById("questions");
-            questions.forEach((q, index) => {
-                const div = document.createElement("div");
-                div.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => 
-                    `<label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`).join("");
-                quizContainer.appendChild(div);
-            });
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResult();
+                return;
+            }
+            const q = questions[currentQuestionIndex];
+            questionContainer.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => 
+                `<label><input type="radio" name="q" value="${opt}"> ${opt}</label><br>`).join("");
         }
 
-        function submitQuiz() {
-            let score = 0;
-            questions.forEach((q, index) => {
-                const selected = document.querySelector(`input[name="q${index}"]:checked`);
-                if (selected && selected.value === q.answer) {
-                    score++;
-                }
-            });
-            document.getElementById("result").textContent = `Your score: ${score}/10`;
+        function nextQuestion() {
+            const selected = document.querySelector(`input[name="q"]:checked`);
+            if (selected && selected.value === questions[currentQuestionIndex].answer) {
+                score++;
+            }
+            currentQuestionIndex++;
+            loadQuestion();
         }
 
-        document.getElementById("quiz-form").addEventListener("submit", (e) => {
-            e.preventDefault();
-            submitQuiz();
-        });
+        function showResult() {
+            questionContainer.innerHTML = "";
+            nextButton.style.display = "none";
+            resultContainer.textContent = `Your score: ${score}/10`;
+        }
 
-        loadQuestions();
+        nextButton.addEventListener("click", nextQuestion);
         startTimer();
+        loadQuestion();
     </script>
 </body>
 </html>
-
