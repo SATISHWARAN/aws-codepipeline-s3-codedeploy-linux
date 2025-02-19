@@ -23,6 +23,12 @@
             font-weight: bold;
             margin-bottom: 20px;
         }
+        .correct {
+            background-color: #90ee90;
+        }
+        .incorrect {
+            background-color: #ffcccb;
+        }
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -62,13 +68,15 @@
         let currentQuestionIndex = 0;
         let score = 0;
         let timeLeft = 600;
+        let timer;
         const timerElement = document.getElementById("timer");
         const questionContainer = document.getElementById("question-container");
         const nextButton = document.getElementById("next-button");
         const resultContainer = document.getElementById("result");
+        const selectedAnswers = [];
 
         function startTimer() {
-            const timer = setInterval(() => {
+            timer = setInterval(() => {
                 let minutes = Math.floor(timeLeft / 60);
                 let seconds = timeLeft % 60;
                 timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
@@ -92,17 +100,31 @@
 
         function nextQuestion() {
             const selected = document.querySelector(`input[name="q"]:checked`);
-            if (selected && selected.value === questions[currentQuestionIndex].answer) {
-                score++;
+            if (selected) {
+                selectedAnswers.push({
+                    question: questions[currentQuestionIndex].question,
+                    selected: selected.value,
+                    correct: questions[currentQuestionIndex].answer
+                });
+                if (selected.value === questions[currentQuestionIndex].answer) {
+                    score++;
+                }
             }
             currentQuestionIndex++;
             loadQuestion();
         }
 
         function showResult() {
-            questionContainer.innerHTML = "";
+            clearInterval(timer);
+            questionContainer.innerHTML = "<h2>Summary</h2>";
+            selectedAnswers.forEach(({ question, selected, correct }) => {
+                questionContainer.innerHTML += `<p>${question}<br>
+                    Your Answer: <span class="${selected === correct ? 'correct' : 'incorrect'}">${selected}</span><br>
+                    Correct Answer: <span class="correct">${correct}</span>
+                </p>`;
+            });
             nextButton.style.display = "none";
-            resultContainer.textContent = `Your score: ${score}/10`;
+            resultContainer.innerHTML = `<h3>Your score: ${score}/10</h3>`;
         }
 
         nextButton.addEventListener("click", nextQuestion);
