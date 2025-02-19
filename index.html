@@ -7,14 +7,16 @@
     <style>
         body {
             text-align: center;
+            background-color: black;
+            color: white;
         }
         .game-container {
             display: grid;
-            grid-template-columns: repeat(10, 30px);
-            grid-template-rows: repeat(10, 30px);
+            grid-template-columns: repeat(20, 30px);
+            grid-template-rows: repeat(20, 30px);
             gap: 2px;
             margin: auto;
-            width: 320px;
+            width: 620px;
             background-color: black;
         }
         .cell {
@@ -33,6 +35,10 @@
             background-color: white;
             border-radius: 50%;
         }
+        .ghost {
+            background-color: red;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
@@ -40,12 +46,13 @@
     <div class="game-container" id="gameBoard"></div>
     <p>Use Arrow Keys to Move</p>
     <script>
-        const gridSize = 10;
+        const gridSize = 20;
         const board = document.getElementById("gameBoard");
         let pacmanPosition = { x: 1, y: 1 };
+        let ghostPosition = { x: 10, y: 10 };
         const walls = [
-            { x: 3, y: 3 }, { x: 3, y: 4 }, { x: 3, y: 5 },
-            { x: 6, y: 6 }, { x: 6, y: 7 }, { x: 6, y: 8 }
+            { x: 5, y: 5 }, { x: 5, y: 6 }, { x: 5, y: 7 },
+            { x: 10, y: 10 }, { x: 10, y: 11 }, { x: 10, y: 12 }
         ];
         let dots = [];
         
@@ -57,6 +64,8 @@
                     cell.classList.add("cell");
                     if (x === pacmanPosition.x && y === pacmanPosition.y) {
                         cell.classList.add("pacman");
+                    } else if (x === ghostPosition.x && y === ghostPosition.y) {
+                        cell.classList.add("ghost");
                     } else if (walls.some(w => w.x === x && w.y === y)) {
                         cell.classList.add("wall");
                     } else if (dots.some(d => d.x === x && d.y === y)) {
@@ -91,7 +100,22 @@
             }
         }
         
+        function moveGhost() {
+            const directions = [
+                { x: 0, y: -1 }, { x: 0, y: 1 },
+                { x: -1, y: 0 }, { x: 1, y: 0 }
+            ];
+            const randomDirection = directions[Math.floor(Math.random() * directions.length)];
+            let newX = ghostPosition.x + randomDirection.x;
+            let newY = ghostPosition.y + randomDirection.y;
+            if (!walls.some(w => w.x === newX && w.y === newY) && newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize) {
+                ghostPosition = { x: newX, y: newY };
+                createBoard();
+            }
+        }
+        
         document.addEventListener("keydown", movePacman);
+        setInterval(moveGhost, 1000);
         generateDots();
         createBoard();
     </script>
