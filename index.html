@@ -3,133 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCQ Test</title>
+    <title>Pac-Man Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
         }
-        .container {
-            max-width: 600px;
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(10, 30px);
+            gap: 2px;
             margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px gray;
+            width: 320px;
+            background-color: black;
         }
-        #timer {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
+        .cell {
+            width: 30px;
+            height: 30px;
+            background-color: black;
         }
-        .correct {
-            background-color: #90ee90;
+        .wall {
+            background-color: blue;
         }
-        .incorrect {
-            background-color: #ffcccb;
+        .pacman {
+            background-color: yellow;
+            border-radius: 50%;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background: #0056b3;
+        .dot {
+            background-color: white;
+            border-radius: 50%;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>MCQ Test</h1>
-        <div id="timer">Time Left: 10:00</div>
-        <div id="question-container"></div>
-        <button id="next-button">Next</button>
-        <div id="result"></div>
-    </div>
+    <h1>Pac-Man Game</h1>
+    <div class="game-container" id="gameBoard"></div>
+    <p>Use Arrow Keys to Move</p>
     <script>
-        const questions = [
-            { question: "What is 2 + 2?", options: ["3", "4", "5", "6"], answer: "4" },
-            { question: "What is the capital of France?", options: ["Berlin", "Madrid", "Paris", "Lisbon"], answer: "Paris" },
-            { question: "What is 5 x 3?", options: ["15", "10", "20", "25"], answer: "15" },
-            { question: "What is the square root of 16?", options: ["2", "4", "6", "8"], answer: "4" },
-            { question: "Which planet is known as the Red Planet?", options: ["Earth", "Mars", "Jupiter", "Venus"], answer: "Mars" },
-            { question: "Who wrote 'Hamlet'?", options: ["Shakespeare", "Dickens", "Austen", "Hemingway"], answer: "Shakespeare" },
-            { question: "What is H2O?", options: ["Oxygen", "Hydrogen", "Water", "Helium"], answer: "Water" },
-            { question: "Which gas do plants use for photosynthesis?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], answer: "Carbon Dioxide" },
-            { question: "How many continents are there on Earth?", options: ["5", "6", "7", "8"], answer: "7" },
-            { question: "What is the largest mammal?", options: ["Elephant", "Blue Whale", "Giraffe", "Shark"], answer: "Blue Whale" }
+        const gridSize = 10;
+        const board = document.getElementById("gameBoard");
+        let pacmanPosition = { x: 1, y: 1 };
+        const walls = [
+            { x: 3, y: 3 }, { x: 3, y: 4 }, { x: 3, y: 5 },
+            { x: 6, y: 6 }, { x: 6, y: 7 }, { x: 6, y: 8 }
         ];
-
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let timeLeft = 600;
-        let timer;
-        const timerElement = document.getElementById("timer");
-        const questionContainer = document.getElementById("question-container");
-        const nextButton = document.getElementById("next-button");
-        const resultContainer = document.getElementById("result");
-        const selectedAnswers = [];
-
-        function startTimer() {
-            timer = setInterval(() => {
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                timerElement.textContent = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    showResult();
-                }
-                timeLeft--;
-            }, 1000);
-        }
-
-        function loadQuestion() {
-            if (currentQuestionIndex >= questions.length) {
-                showResult();
-                return;
-            }
-            const q = questions[currentQuestionIndex];
-            questionContainer.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => 
-                `<label><input type="radio" name="q" value="${opt}"> ${opt}</label><br>`).join("");
-        }
-
-        function nextQuestion() {
-            const selected = document.querySelector(`input[name="q"]:checked`);
-            if (selected) {
-                selectedAnswers.push({
-                    question: questions[currentQuestionIndex].question,
-                    selected: selected.value,
-                    correct: questions[currentQuestionIndex].answer
-                });
-                if (selected.value === questions[currentQuestionIndex].answer) {
-                    score++;
+        let dots = [];
+        
+        function createBoard() {
+            board.innerHTML = "";
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    if (x === pacmanPosition.x && y === pacmanPosition.y) {
+                        cell.classList.add("pacman");
+                    } else if (walls.some(w => w.x === x && w.y === y)) {
+                        cell.classList.add("wall");
+                    } else if (dots.some(d => d.x === x && d.y === y)) {
+                        cell.classList.add("dot");
+                    }
+                    board.appendChild(cell);
                 }
             }
-            currentQuestionIndex++;
-            loadQuestion();
         }
-
-        function showResult() {
-            clearInterval(timer);
-            questionContainer.innerHTML = "<h2>Summary</h2>";
-            selectedAnswers.forEach(({ question, selected, correct }) => {
-                questionContainer.innerHTML += `<p>${question}<br>
-                    Your Answer: <span class="${selected === correct ? 'correct' : 'incorrect'}">${selected}</span><br>
-                    Correct Answer: <span class="correct">${correct}</span>
-                </p>`;
-            });
-            nextButton.style.display = "none";
-            resultContainer.innerHTML = `<h3>Your score: ${score}/10</h3>`;
+        
+        function generateDots() {
+            for (let y = 0; y < gridSize; y++) {
+                for (let x = 0; x < gridSize; x++) {
+                    if (!walls.some(w => w.x === x && w.y === y) && (x !== pacmanPosition.x || y !== pacmanPosition.y)) {
+                        dots.push({ x, y });
+                    }
+                }
+            }
         }
-
-        nextButton.addEventListener("click", nextQuestion);
-        startTimer();
-        loadQuestion();
+        
+        function movePacman(event) {
+            let newX = pacmanPosition.x;
+            let newY = pacmanPosition.y;
+            if (event.key === "ArrowUp") newY--;
+            if (event.key === "ArrowDown") newY++;
+            if (event.key === "ArrowLeft") newX--;
+            if (event.key === "ArrowRight") newX++;
+            if (!walls.some(w => w.x === newX && w.y === newY) && newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize) {
+                pacmanPosition = { x: newX, y: newY };
+                dots = dots.filter(d => !(d.x === newX && d.y === newY));
+                createBoard();
+            }
+        }
+        
+        document.addEventListener("keydown", movePacman);
+        generateDots();
+        createBoard();
     </script>
 </body>
 </html>
